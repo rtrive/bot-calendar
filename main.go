@@ -8,13 +8,18 @@ import (
 	"github.com/joho/godotenv"
 )
 
-func main() {
+func CheckEnv(name string) string {
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
+	env := os.Getenv(name)
+	return env
+}
 
-	telegramBotApiKey := os.Getenv("TELEGRAM_BOT_API_KEY")
+func main() {
+
+	telegramBotApiKey := CheckEnv("TELEGRAM_BOT_API_KEY")
 
 	bot, err := tgbotapi.NewBotAPI(telegramBotApiKey)
 	if err != nil {
