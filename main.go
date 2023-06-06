@@ -28,4 +28,16 @@ func main() {
 	bot.Debug = true
 
 	log.Printf("Authorized on account %s", bot.Self.UserName)
+
+	updateConfig := tgbotapi.NewUpdate(0)
+
+	updateConfig.Timeout = 30
+
+	updates := bot.GetUpdatesChan(updateConfig)
+
+	for update := range updates {
+		if update.Message == nil {
+			continue
+		}
+	}
 }
