@@ -1,8 +1,10 @@
 package main
 
-import "testing"
+import (
+	"testing"
+)
 
-func TestCheckEnv(t *testing.T) {
+func TestCheckEnvOk(t *testing.T) {
 	t.Setenv("TELEGRAM_API_BOT_KEY", "test")
 
 	got := CheckEnv("TELEGRAM_API_BOT_KEY")
