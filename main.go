@@ -3,41 +3,26 @@ package main
 import (
 	"log"
 	"os"
+	"time"
 
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
-	"github.com/joho/godotenv"
+	tele "gopkg.in/telebot.v3"
 )
 
-func CheckEnv(name string) string {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
-	env := os.Getenv(name)
-	return env
-}
-
 func main() {
+	pref := tele.Settings{
+		Token:  os.Getenv("TOKEN"),
+		Poller: &tele.LongPoller{Timeout: 10 * time.Second},
+	}
 
-	telegramBotApiKey := CheckEnv("TELEGRAM_BOT_API_KEY")
-
-	bot, err := tgbotapi.NewBotAPI(telegramBotApiKey)
+	b, err := tele.NewBot(pref)
 	if err != nil {
-		log.Panic(err)
+		log.Fatal(err)
+		return
 	}
-	bot.Debug = true
 
-	log.Printf("Authorized on account %s", bot.Self.UserName)
+	b.Handle("/hello", func(c tele.Context) error {
+		return c.Send("Hello!")
+	})
 
-	updateConfig := tgbotapi.NewUpdate(0)
-
-	updateConfig.Timeout = 30
-
-	updates := bot.GetUpdatesChan(updateConfig)
-
-	for update := range updates {
-		if update.Message == nil {
-			continue
-		}
-	}
+	b.Start()
 }
