@@ -5,12 +5,25 @@ import (
 	"os"
 	"time"
 
+	"github.com/joho/godotenv"
 	tele "gopkg.in/telebot.v3"
 )
 
+func CheckEnv(name string) string {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+	env := os.Getenv(name)
+	return env
+}
+
 func main() {
+
+	telegramBotApiKey := CheckEnv("TELEGRAM_BOT_API_KEY")
+
 	pref := tele.Settings{
-		Token:  os.Getenv("TOKEN"),
+		Token:  telegramBotApiKey,
 		Poller: &tele.LongPoller{Timeout: 10 * time.Second},
 	}
 
@@ -19,10 +32,6 @@ func main() {
 		log.Fatal(err)
 		return
 	}
-
-	b.Handle("/hello", func(c tele.Context) error {
-		return c.Send("Hello!")
-	})
 
 	b.Start()
 }
