@@ -3,9 +3,10 @@ package main
 import (
 	"log"
 	"os"
+	"time"
 
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/joho/godotenv"
+	tele "gopkg.in/telebot.v3"
 )
 
 func CheckEnv(name string) string {
@@ -21,23 +22,16 @@ func main() {
 
 	telegramBotApiKey := CheckEnv("TELEGRAM_BOT_API_KEY")
 
-	bot, err := tgbotapi.NewBotAPI(telegramBotApiKey)
+	pref := tele.Settings{
+		Token:  telegramBotApiKey,
+		Poller: &tele.LongPoller{Timeout: 10 * time.Second},
+	}
+
+	b, err := tele.NewBot(pref)
 	if err != nil {
-		log.Panic(err)
+		log.Fatal(err)
+		return
 	}
-	bot.Debug = true
 
-	log.Printf("Authorized on account %s", bot.Self.UserName)
-
-	updateConfig := tgbotapi.NewUpdate(0)
-
-	updateConfig.Timeout = 30
-
-	updates := bot.GetUpdatesChan(updateConfig)
-
-	for update := range updates {
-		if update.Message == nil {
-			continue
-		}
-	}
+	b.Start()
 }
