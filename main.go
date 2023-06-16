@@ -16,7 +16,19 @@ import (
 	"google.golang.org/api/option"
 )
 
-func CheckEnv(name string) string {
+const primaryCalendar = "primary"
+
+func getTodayEvent(srv *calendar.Service) []*calendar.Event {
+	t := time.Now()
+
+	todayMidnight := time.Date(t.Year(), t.Month(), t.Day(), 0, 0, 0, 0, t.Location()).Format(time.RFC3339)
+	todayEnd := time.Date(t.Year(), t.Month(), t.Day(), 23, 59, 59, 99, t.Location()).Format(time.RFC3339)
+
+	todayEvents, _ := srv.Events.List(primaryCalendar).TimeMin(todayMidnight).TimeMax(todayEnd).ShowDeleted(false).SingleEvents(true).Do()
+	return todayEvents.Items
+}
+
+func checkEnv(name string) string {
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Error loading .env file")
@@ -101,22 +113,5 @@ func main() {
 		log.Fatalf("Unable to retrieve Calendar client: %v", err)
 	}
 
-	t := time.Now().Format(time.RFC3339)
-	events, err := srv.Events.List("primary").ShowDeleted(false).
-		SingleEvents(true).TimeMin(t).MaxResults(10).OrderBy("startTime").Do()
-	if err != nil {
-		log.Fatalf("Unable to retrieve next ten of the user's events: %v", err)
-	}
-	fmt.Println("Upcoming events:")
-	if len(events.Items) == 0 {
-		fmt.Println("No upcoming events found.")
-	} else {
-		for _, item := range events.Items {
-			date := item.Start.DateTime
-			if date == "" {
-				date = item.Start.Date
-			}
-			fmt.Printf("%v (%v)\n", item.Summary, date)
-		}
-	}
+	_ = getTodayEvent(srv)
 }

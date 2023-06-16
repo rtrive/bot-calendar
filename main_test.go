@@ -7,7 +7,7 @@ import (
 func TestCheckEnvOk(t *testing.T) {
 	t.Setenv("TELEGRAM_API_BOT_KEY", "test")
 
-	got := CheckEnv("TELEGRAM_API_BOT_KEY")
+	got := checkEnv("TELEGRAM_API_BOT_KEY")
 	want := "test"
 
 	if got != want {
