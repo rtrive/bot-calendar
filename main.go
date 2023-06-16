@@ -1,8 +1,6 @@
 package main
 
 import (
-	"context"
-	"fmt"
 	"log"
 	"os"
 
@@ -19,12 +17,6 @@ func checkEnv(name string) string {
 }
 
 func main() {
-	ctx := context.Background()
-	client := initOauth()
-	srv := initCalendar(ctx, client)
 
-	todayEvents := getTodayEvent(srv)
-	for _, event := range todayEvents {
-		fmt.Println(event.Summary)
-	}
+	initBot()
 }
