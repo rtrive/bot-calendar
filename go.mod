@@ -28,4 +28,8 @@ require (
 	gopkg.in/telebot.v3 v3.1.3 // indirect
 )
 
-require google.golang.org/api v0.126.0
+require (
+	github.com/robfig/cron v1.2.0
+	github.com/robfig/cron/v3 v3.0.1
+	google.golang.org/api v0.126.0
+)
