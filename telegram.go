@@ -44,9 +44,12 @@ func initBot() {
 		cr.AddFunc("1 * * * *", func() {
 			todayEvent := getTodayEvent(srv)
 			var event string
+			event += fmt.Sprintf("----------------------------------\n")
+			event += fmt.Sprintf("|Start Date | End Date | Summary |\n")
 			for _, ev := range todayEvent {
-				event += fmt.Sprintf("Start Date %s, End Date %s, Summary %s\n", ev.Start.DateTime, ev.End.DateTime, ev.Summary)
+				event += fmt.Sprintf("%s | %s | %s\n", u.GetShortTime(ev.Start.DateTime), u.GetShortTime(ev.End.DateTime), ev.Summary)
 			}
+			event += fmt.Sprintf("----------------------------------\n")
 			b.Send(c.Sender(), event)
 		})
 		cr.AddFunc("1 * * * *", func() {
