@@ -7,12 +7,13 @@ import (
 	"time"
 
 	"github.com/robfig/cron"
+	u "github.com/rtrive/bot-calendar/utility"
 	tele "gopkg.in/telebot.v3"
 )
 
 func initBot() {
 	pref := tele.Settings{
-		Token:  checkEnv("TELEGRAM_BOT_API_KEY"),
+		Token:  u.CheckEnv("TELEGRAM_BOT_API_KEY"),
 		Poller: &tele.LongPoller{Timeout: 10 * time.Second},
 	}
 	cr := cron.New()
