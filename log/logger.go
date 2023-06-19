@@ -29,7 +29,7 @@ func Info(message string) {
 	log.Info(message)
 }
 
-func Error(message string) {
+func Error(message error) {
 	log.Error(message)
 }
 
