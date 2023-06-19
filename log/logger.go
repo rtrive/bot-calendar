@@ -10,11 +10,13 @@ var log *zap.SugaredLogger
 func init() {
 
 	cfgEncoderConfig := zapcore.EncoderConfig{
-		MessageKey:  "message",
-		LevelKey:    "level",
-		EncodeLevel: zapcore.LowercaseLevelEncoder,
-		TimeKey:     "timestamp",
-		EncodeTime:  zapcore.RFC3339TimeEncoder,
+		MessageKey:   "message",
+		LevelKey:     "level",
+		EncodeLevel:  zapcore.LowercaseLevelEncoder,
+		TimeKey:      "timestamp",
+		EncodeTime:   zapcore.RFC3339TimeEncoder,
+		CallerKey:    "caller",
+		EncodeCaller: zapcore.ShortCallerEncoder,
 	}
 	config := zap.NewProductionConfig()
 	config.EncoderConfig = cfgEncoderConfig
