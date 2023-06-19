@@ -18,8 +18,7 @@ func init() {
 		"encoderConfig": {
 		  "messageKey": "message",
 		  "levelKey": "level",
-		  "levelEncoder": "lowercase",
-		  "functionKey" : "function"
+		  "levelEncoder": "lowercase"
 		}
 	  }`)
 	var cfg zap.Config
@@ -32,6 +31,14 @@ func init() {
 	log = logger.Sugar()
 }
 
-func Info(v ...interface{}) {
-	log.Info(v)
+func Info(message string) {
+	log.Info(message)
+}
+
+func Error(message string) {
+	log.Error(message)
+}
+
+func Debug(message string) {
+	log.Debug(message)
 }
