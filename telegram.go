@@ -40,18 +40,16 @@ func initBot() {
 	b.Handle("/start", func(c tele.Context) error {
 		log.Debug(fmt.Sprintf("Command start initiated by %s", c.Chat().Username))
 		log.Info("Creating calendar and test cron every 1 minute")
+
 		cr.AddFunc("1 * * * *", func() {
-			log.Debug("Getting events from calendars")
 			todayEvent := getTodayEvent(srv)
 			var event string
 			for _, ev := range todayEvent {
 				event += fmt.Sprintf("Start Date %s, End Date %s, Summary %s\n", ev.Start.DateTime, ev.End.DateTime, ev.Summary)
 			}
-			log.Debug(event)
 			b.Send(c.Sender(), event)
 		})
 		cr.AddFunc("1 * * * *", func() {
-			log.Debug("Sending test")
 			b.Send(c.Sender(), "test")
 		})
 
