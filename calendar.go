@@ -2,10 +2,10 @@ package main
 
 import (
 	"context"
-	"log"
 	"net/http"
 	"time"
 
+	log "github.com/rtrive/bot-calendar/log"
 	"google.golang.org/api/calendar/v3"
 	"google.golang.org/api/option"
 )
@@ -25,7 +25,7 @@ func getTodayEvent(srv *calendar.Service) []*calendar.Event {
 func initCalendar(ctx context.Context, client *http.Client) *calendar.Service {
 	srv, err := calendar.NewService(ctx, option.WithHTTPClient(client))
 	if err != nil {
-		log.Fatalf("Unable to retrieve Calendar client: %v", err)
+		log.Error(err)
 	}
 	return srv
 }
