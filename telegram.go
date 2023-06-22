@@ -3,13 +3,38 @@ package main
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/robfig/cron"
 	log "github.com/rtrive/bot-calendar/log"
 	u "github.com/rtrive/bot-calendar/utility"
+	"google.golang.org/api/calendar/v3"
 	tele "gopkg.in/telebot.v3"
 )
+
+func generateHTML(events []*calendar.Event) string {
+	var builder strings.Builder
+
+	builder.WriteString("<ul>")
+	builder.WriteString("<li>Start Date</li>")
+	builder.WriteString("<li>End Date</li>")
+	builder.WriteString("<li>Summary</li>")
+	for _, ev := range events {
+		builder.WriteString("<li>")
+		builder.WriteString(u.GetShortTime(ev.Start.DateTime))
+		builder.WriteString("</li>")
+		builder.WriteString("<li>")
+		builder.WriteString(u.GetShortTime(ev.End.DateTime))
+		builder.WriteString("</li>")
+		builder.WriteString("<li>")
+		builder.WriteString(ev.Summary)
+		builder.WriteString("</li>")
+	}
+	builder.WriteString("</ul>")
+
+	return builder.String()
+}
 
 func initBot() {
 	log.Debug("Check telegram api key")
@@ -41,22 +66,21 @@ func initBot() {
 		log.Debug(fmt.Sprintf("Command start initiated by %s", c.Chat().Username))
 		log.Info("Creating calendar and test cron every 1 minute")
 
-		cr.AddFunc("1 * * * *", func() {
+		cr.AddFunc("1 * * * * ", func() {
 			todayEvent := getTodayEvent(srv)
 			var event string
-			event += fmt.Sprintf("----------------------------------\n")
-			event += fmt.Sprintf("|Start Date | End Date | Summary |\n")
+			event += fmt.Sprintf("<pre>")
+			event += fmt.Sprintf("| Start Date | End Date | Summary |\n")
+			event += fmt.Sprintf("-----------------------------------\n")
 			for _, ev := range todayEvent {
-				event += fmt.Sprintf("%s | %s | %s\n", u.GetShortTime(ev.Start.DateTime), u.GetShortTime(ev.End.DateTime), ev.Summary)
+				event += fmt.Sprintf("| %s | %s | %s\n", u.GetShortTime(ev.Start.DateTime), u.GetShortTime(ev.End.DateTime), ev.Summary)
 			}
-			event += fmt.Sprintf("----------------------------------\n")
-			b.Send(c.Sender(), event)
-		})
-		cr.AddFunc("1 * * * *", func() {
-			b.Send(c.Sender(), "test")
+			event += fmt.Sprintf("</pre>")
+			b.Send(c.Sender(), event, &tele.SendOptions{ParseMode: tele.ModeHTML})
 		})
 
 		return c.Send("Bot Started, you will receive some messages, I hope")
+
 	})
 
 	b.Start()
