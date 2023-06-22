@@ -3,9 +3,9 @@ package main
 import (
 	"context"
 	"fmt"
-	"strings"
 	"time"
 
+	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/robfig/cron"
 	log "github.com/rtrive/bot-calendar/log"
 	u "github.com/rtrive/bot-calendar/utility"
@@ -13,27 +13,19 @@ import (
 	tele "gopkg.in/telebot.v3"
 )
 
-func generateHTML(events []*calendar.Event) string {
-	var builder strings.Builder
-
-	builder.WriteString("<ul>")
-	builder.WriteString("<li>Start Date</li>")
-	builder.WriteString("<li>End Date</li>")
-	builder.WriteString("<li>Summary</li>")
+func generateTable(events []*calendar.Event) string {
+	tw := table.NewWriter()
+	colTitleStartDate := "Start Date"
+	colTitleEndDate := "End Date"
+	colTitleSummary := "Summary"
+	tableHeader := table.Row{colTitleStartDate, colTitleEndDate, colTitleSummary}
+	tw.SetTitle("Calendar")
+	tw.SetStyle(table.StyleRounded)
+	tw.AppendHeader(tableHeader)
 	for _, ev := range events {
-		builder.WriteString("<li>")
-		builder.WriteString(u.GetShortTime(ev.Start.DateTime))
-		builder.WriteString("</li>")
-		builder.WriteString("<li>")
-		builder.WriteString(u.GetShortTime(ev.End.DateTime))
-		builder.WriteString("</li>")
-		builder.WriteString("<li>")
-		builder.WriteString(ev.Summary)
-		builder.WriteString("</li>")
+		tw.AppendRow(table.Row{u.GetShortTime(ev.Start.DateTime), u.GetShortTime(ev.End.DateTime), ev.Summary})
 	}
-	builder.WriteString("</ul>")
-
-	return builder.String()
+	return tw.Render()
 }
 
 func initBot() {
@@ -68,19 +60,11 @@ func initBot() {
 
 		cr.AddFunc("1 * * * * ", func() {
 			todayEvent := getTodayEvent(srv)
-			var event string
-			event += fmt.Sprintf("<pre>")
-			event += fmt.Sprintf("| Start Date | End Date | Summary |\n")
-			event += fmt.Sprintf("-----------------------------------\n")
-			for _, ev := range todayEvent {
-				event += fmt.Sprintf("| %s | %s | %s\n", u.GetShortTime(ev.Start.DateTime), u.GetShortTime(ev.End.DateTime), ev.Summary)
-			}
-			event += fmt.Sprintf("</pre>")
-			b.Send(c.Sender(), event, &tele.SendOptions{ParseMode: tele.ModeHTML})
+			message := generateTable(todayEvent)
+			b.Send(c.Sender(), message)
 		})
 
 		return c.Send("Bot Started, you will receive some messages, I hope")
-
 	})
 
 	b.Start()
