@@ -25,7 +25,7 @@ func generateTable(events []*calendar.Event) string {
 	for _, ev := range events {
 		tw.AppendRow(table.Row{u.GetShortTime(ev.Start.DateTime), u.GetShortTime(ev.End.DateTime), ev.Summary})
 	}
-	return tw.Render()
+	return fmt.Sprintf("<pre>%s</pre>", tw.Render())
 }
 
 func initBot() {
@@ -61,7 +61,7 @@ func initBot() {
 		cr.AddFunc("1 * * * * ", func() {
 			todayEvent := getTodayEvent(srv)
 			message := generateTable(todayEvent)
-			b.Send(c.Sender(), message)
+			b.Send(c.Sender(), message, &tele.SendOptions{ParseMode: tele.ModeHTML})
 		})
 
 		return c.Send("Bot Started, you will receive some messages, I hope")
